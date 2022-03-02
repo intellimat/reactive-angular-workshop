@@ -7,13 +7,13 @@ import { Hero, HeroService } from '../../services/hero.service';
     styleUrls: ['./hero-table.component.scss'],
 })
 export class HeroTableComponent implements OnInit {
-    heroes: Hero[];
+    heroes$ = this.hero.heroes$;
 
-    constructor(public hero: HeroService) {
-        hero.heroes$.subscribe(heroes => {
-            this.heroes = heroes;
-        });
-    }
+    constructor(public hero: HeroService) {}
 
     ngOnInit() {}
+
+    doSearch(event: any) {
+        this.hero.searchBS.next(event.target.value);
+    }
 }
