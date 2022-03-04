@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { debounceTime, map, shareReplay, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Hero {
@@ -56,6 +56,8 @@ export class HeroService {
     limitBS = new BehaviorSubject(DEFAULT_LIMIT);
     pageBS = new BehaviorSubject(DEFAULT_PAGE);
 
+    userPage$ = this.pageBS.pipe(map(pageValue => pageValue + 1));
+
     params$ = combineLatest([this.searchBS, this.limitBS, this.pageBS]).pipe(
         map(([SearchTerm, limit, page]) => {
             const params: any = {
@@ -72,9 +74,20 @@ export class HeroService {
         }),
     );
 
-    heroes$: Observable<Hero[]> = this.params$.pipe(
+    private heroesResponse$ = this.params$.pipe(
+        debounceTime(500),
         switchMap(_params => this.http.get(HERO_API, { params: _params })),
-        map((res: any) => res.data.results),
+        shareReplay(1),
+    );
+
+    heroes$ = this.heroesResponse$.pipe(map((res: any) => res.data.results));
+
+    totalResults$ = this.heroesResponse$.pipe(
+        map((res: any) => res.data.total),
+    );
+
+    totalPagesBS = combineLatest([this.totalResults$, this.limitBS]).pipe(
+        map(([totalResults, limit]) => Math.ceil(totalResults / limit)),
     );
 
     // heroes$: Observable<Hero[]> = this.http
