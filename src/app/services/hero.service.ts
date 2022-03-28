@@ -42,9 +42,9 @@ const LIMIT_MID = 25;
 const LIMIT_HIGH = 100;
 const LIMITS = [LIMIT_LOW, LIMIT_MID, LIMIT_HIGH];
 
-const DEFAULT_SEARCH = '';
-const DEFAULT_LIMIT = LIMIT_HIGH;
-const DEFAULT_PAGE = 0;
+export const DEFAULT_SEARCH = '';
+export const DEFAULT_LIMIT = LIMIT_HIGH;
+export const DEFAULT_PAGE = 0;
 
 @Injectable({
     providedIn: 'root',
@@ -86,20 +86,9 @@ export class HeroService {
         map((res: any) => res.data.total),
     );
 
-    totalPagesBS = combineLatest([this.totalResults$, this.limitBS]).pipe(
+    totalPages$ = combineLatest([this.totalResults$, this.limitBS]).pipe(
         map(([totalResults, limit]) => Math.ceil(totalResults / limit)),
     );
-
-    // heroes$: Observable<Hero[]> = this.http
-    //     .get(HERO_API, {
-    //         params: {
-    //             apikey: environment.MARVEL_API.PUBLIC_KEY,
-    //             limit: `${LIMIT_LOW}`,
-    //             // nameStartsWith: 'iron', // once we have search
-    //             offset: `${0}`, // page * limit
-    //         },
-    //     })
-    //     .pipe(map((res: any) => res.data.results));
 
     constructor(private http: HttpClient) {}
 }

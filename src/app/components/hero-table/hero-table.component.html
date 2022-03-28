@@ -13,14 +13,30 @@
                 >Page {{ userPage$ | async }} of {{ totalPages$ | async }} :
             </label>
             <span class="buttons">
-                <button class="prev">Prev</button>
-                <button class="next">Next</button>
+                <button
+                    class="prev"
+                    [disabled]="(userPage$ | async) === 1"
+                    (click)="movePageBy(-1)"
+                >
+                    Prev
+                </button>
+                <button
+                    class="next"
+                    [disabled]="(userPage$ | async) === (totalPages$ | async)"
+                    (click)="movePageBy(1)"
+                >
+                    Next
+                </button>
             </span>
         </span>
         <span class="result-tool">
             <label>Show Results: </label>
             <span class="buttons">
-                <button *ngFor="let limit of hero.limits">
+                <button
+                    (click)="setLimit(limit)"
+                    *ngFor="let limit of hero.limits"
+                    [disabled]="(limit$ | async) === limit"
+                >
                     {{ limit }}
                 </button>
             </span>
